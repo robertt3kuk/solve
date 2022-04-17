@@ -127,22 +127,64 @@ namespace solve
         public string pathy;
 
     }
-
+    
 
     static class Program
     {
         static void Main(string[] args)
 
         {
-            string[] files = Directory.GetFiles(Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory),
-                "sorted*");
+            string[] files = Directory.GetFiles(Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory), "sorted*");
             foreach (string file in files)
             {
                 File.Delete(file);
-                MakeCalcReturn();
             }
+                MakeCalcReturn();
+        } 
+        static void RandBench(int[] arr, int times)
+        {
+                 Random random = new Random();
+                 Stooge sto = new Stooge();
+                 Bubby bub = new Bubby();
+                 Shaker sha = new Shaker();
+                
+                 Stopwatch s1 = new Stopwatch();
+                 Stopwatch s2 = new Stopwatch();
+                 Stopwatch s3 = new Stopwatch();
+                 for (int i = 0; i <times; i++)
+                 {
+                     
+                    arr = arr.OrderBy(x => random.Next()).ToArray();
+                    s1.Start();
+                    var stos = sto.StoogeSort(arr);
+                    s1.Stop();
+                    arr = arr.OrderBy(x => random.Next()).ToArray();
+                    s2.Start();
+                    var bubi = bub.BubbleSort(arr );
+                    s2.Stop();
+                    arr = arr.OrderBy(x => random.Next()).ToArray();
+                    
+                    s3.Start();
+                    var shaki = sha.ShakerSort(arr );
+                    s3.Stop();
 
-            static ArrayandPath ReadAndRun()
+
+
+
+                 }
+
+                  
+                 Console.WriteLine("average speed of stoogesort is {0} mil after {1}",s1.ElapsedMilliseconds/times,times);
+                 
+                 Console.WriteLine("average speed of bubblesort is {0} mil after {1}",s2.ElapsedMilliseconds/times,times);
+                 Console.WriteLine("average speed of shakersort is {0} mil after {1}",s3.ElapsedMilliseconds/times,times);
+                 
+                 
+                 
+        }
+
+
+        static ArrayandPath ReadAndRun()
             {
                 // Read the data.txt textfile.
                 string _filePath = Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory);
@@ -255,15 +297,15 @@ namespace solve
                 Console.WriteLine(
                     "1-Stooge sort; 2-Buuble sort; 3-Shaker-sort,4 show the the fastest(only after using all three)");
                 Console.WriteLine("5 - to save sorted file");
-                Console.WriteLine("6-to choose another file,input 7 twice to stop the program");
+                Console.WriteLine("6-to choose another file,input 7 to benchmark");
 
 
 
 
-                while (sortype < 7)
+                while (sortype < 8)
                 {
                     sortype = Convert.ToInt32(Console.ReadLine());
-                    if (sortype >= 7)
+                    if (sortype >= 8)
                     {
 
                         break;
@@ -345,8 +387,15 @@ namespace solve
                                 "1-Stooge sort; 2-Buuble sort; 3-Shaker-sort,4 show the the fastest(only after using all three)");
 
                             Console.WriteLine("5 - to save sorted file");
-                            Console.WriteLine("6-to choose another file,input 7 twice to stop");
+                            Console.WriteLine("6-to choose another file,input 7 to benchmark");
                             break;
+                        case 7:
+                            Console.Write("how many time should it be shuffled and ran: ");
+                            var timestorun = Convert.ToInt32(Console.ReadLine());
+                            
+                            RandBench(intarray,timestorun);
+                            break;
+                            
 
 
 
@@ -377,7 +426,8 @@ namespace solve
                 Console.ReadLine();
 
             }
-        }
     }
 }
+ 
+ 
  
