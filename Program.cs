@@ -1,10 +1,48 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Runtime.Intrinsics.X86;
 
 namespace solve
 
 {
+    public class Stooge
+    {
+        // element exchange method
+        static void Swap(ref int a, ref int b)
+        {
+            var t = a;
+            a = b;
+            b = t;
+        }
+
+        // sort by parts
+        static int[] StoogeSort(int[] array, int startIndex, int endIndex)
+        {
+            if (array[startIndex] > array[endIndex])
+            {
+                Swap(ref array[startIndex], ref array[endIndex]);
+            }
+
+            if (endIndex - startIndex > 1)
+            {
+                var len = (endIndex - startIndex + 1) / 3;
+                StoogeSort(array, startIndex, endIndex - len);
+                StoogeSort(array, startIndex + len, endIndex);
+                StoogeSort(array, startIndex, endIndex - len);
+            }
+
+            return array;
+        }
+
+        public int[] StoogeSort(int[] array)
+        {
+            var arr = StoogeSort(array, 0, array.Length - 1);
+            return arr;
+
+        }
+    }
+
     public class Shaker
     {
         // elements exchange method
@@ -50,8 +88,8 @@ namespace solve
 
             return array;
         }
-
     }
+
     public class Bubby
     {
         // elements exchange method
@@ -78,145 +116,268 @@ namespace solve
             }
 
             return array;
-        }
 
+
+        }
     }
-    public  class Randy
+
+    struct ArrayandPath
     {
-        // method for checking array ordering
-        static bool IsSorted(int[] a)
-        {
-            for (int i = 0; i < a.Length - 1; i++)
-            {
-                if (a[i] > a[i + 1])
-                    return false;
-            }
+        public int[] arr;
+        public string pathy;
 
-            return true;
-        }
-
-        // shuffle array elements
-        static int[] RandomPermutation(int[] a)
-        {
-            Random random = new Random();
-            var n = a.Length;
-            while (n > 1)
-            {
-                n--;
-                var i = random.Next(n + 1);
-                (a[i], a[n]) = (a[n], a[i]);
-            }
-
-            return a;
-        }
-
-        // random sort
-        public  int[] BogoSort(int[] a)
-
-        {
-            while (!IsSorted(a))
-            {
-                a = RandomPermutation(a);
-            }
-            clock.Stop();
-
-            return a;
-        }
-
-        
     }
+
 
     static class Program
     {
         static void Main(string[] args)
-        {   
-            // Read the data.txt textfile.
-            var data = System.IO.File.ReadAllText(@"/Users/biqontie/RiderProjects/solve/text.txt");
 
-            // Create a new List of int[]
-            var arrays = new List<int[]> ();
-
-            // Split data file content into lines
-            var lines = data.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries); 
-            var lineArray = new List<int>();
-
-            // Loop all lines
-            foreach (var line in lines)
+        {
+            string[] files = Directory.GetFiles(Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory),
+                "sorted*");
+            foreach (string file in files)
             {
-                // Create a new List<int> representing all the commaseparated numbers in this line
-
-                // Slipt line by , and loop through all the numeric valus
-                foreach (var s in line.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-                {
-                    // Add converted numeric value to our lineArray 
-                    lineArray.Add((int) Convert.ToInt64(s));
-                    //lineArray.Add(Convert.ToSingle(s));
-                }
-                // Add lineArray to main array
-                arrays.Add(lineArray.ToArray());
-
+                File.Delete(file);
+                MakeCalcReturn();
             }
 
-            var stringarr = string.Join(",", lineArray);
-            var parts = stringarr.Split(new[] { "", ",", ";" }, StringSplitOptions.RemoveEmptyEntries);
-            var intarray = new int[parts.Length];
-            for (int i = 0; i < parts.Length; i++)
+            static ArrayandPath ReadAndRun()
             {
-                intarray[i] = Convert.ToInt32(parts[i]);
-            }
-            
-            Randy ran = new Randy();
-            Bubby bub = new Bubby();
-            Shaker shak = new Shaker();
-            
-
-            var sortype = Convert.ToInt32(Console.ReadLine());
-            
-            while (sortype < 5)
-            {
-                sortype = Convert.ToInt32(Console.ReadLine());
-                switch (sortype)
+                // Read the data.txt textfile.
+                string _filePath = Path.GetDirectoryName(System.AppDomain.CurrentDomain.BaseDirectory);
+                var filesin = System.IO.Directory.GetFiles(_filePath, "*.txt");
+                var poop = filesin;
+                List<string> listi = poop.ToList();
+                var pot = _filePath;
+                for (int i = 0; i < poop.Length; i++)
                 {
-                    case 1:
-                        var rand = ran.BogoSort(intarray);
-                        Console.WriteLine("Random sort used:{0}", string.Join(",", rand));
 
-                        break;
-                    case 2:
-
-                        var bubd = bub.BubbleSort(intarray);
-                        Console.WriteLine("Bubble sort used:{0}", string.Join(",", bubd));
-                        break;
-                    case 3:
-                        var shaka = shak.ShakerSort(intarray);
-                        Console.WriteLine("Shaker sort used:{0}", string.Join(",", shaka));
-                        break;
-
-
-
-
+                    listi[i] = poop[i].Remove(0, pot.Length + 1);
 
 
                 }
 
+
+                Console.WriteLine("Choose the file in da directory containing numbers in it to sort");
+                Console.WriteLine("zero is the first file and so on ");
+
+
+                for (int i = 0; i < listi.Count; i++)
+                {
+                    Console.WriteLine("index: {1} --->{0}", listi[i], i);
+
+                }
+
+                //Console.WriteLine("{0}", string.Join('\n', listi));
+                var indexoffile = Convert.ToInt32(Console.ReadLine());
+                string pathtofile;
+                if (indexoffile > filesin.Length - 1)
+                {
+                    pathtofile = filesin[^1];
+
+                }
+                else
+                {
+                    pathtofile = filesin[indexoffile];
+
+                }
+
+
+                //string txtfilename = Console.ReadLine()+".txt";
+                var data = System.IO.File.ReadAllText(@pathtofile);
+                //var data = System.IO.File.ReadAllText(@"/Users/biqontie/RiderProjects/solve/output.txt");
+
+                // Create a new List of int[]
+                var arrays = new List<int[]>();
+
+                // Split data file content into lines
+                var lines = data.Split(new[] {'\r', '\n'}, StringSplitOptions.RemoveEmptyEntries);
+                var lineArray = new List<int>();
+
+                // Loop all lines
+                foreach (var line in lines)
+                {
+                    // Create a new List<int> representing all the commaseparated numbers in this line
+
+                    // Slipt line by , and loop through all the numeric valus
+                    foreach (var s in line.Split(new[] {','}, StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        // Add converted numeric value to our lineArray 
+                        lineArray.Add((int) Convert.ToInt64(s));
+                        //lineArray.Add(Convert.ToSingle(s));
+                    }
+
+                    // Add lineArray to main array
+                    arrays.Add(lineArray.ToArray());
+
+                }
+
+                var stringarr = string.Join(",", lineArray);
+                var parts = stringarr.Split(new[] {"", ",", ";"}, StringSplitOptions.RemoveEmptyEntries);
+                var intarray = new int[parts.Length];
+                for (int i = 0; i < parts.Length; i++)
+                {
+                    intarray[i] = Convert.ToInt32(parts[i]);
+                }
+
+                ArrayandPath arry = new ArrayandPath();
+                arry.arr = intarray;
+                arry.pathy = listi[indexoffile][0..^4];
+                return arry;
+
             }
 
+            static async Task WriteThetext(int[] intarray, string pathy)
+            {
+                string text = String.Join(",", intarray);
+                await File.WriteAllTextAsync("sorted_" + pathy + ".txt", text);
+            }
+
+            static void MakeCalcReturn()
+            {
+
+                ArrayandPath rs = ReadAndRun();
+                var intarray = rs.arr;
+                var pathy = rs.pathy;
+
+
+
+                Bubby bub = new Bubby();
+                Shaker shak = new Shaker();
+                Stooge sto = new Stooge();
+                Stopwatch s1 = new Stopwatch();
+                Stopwatch s2 = new Stopwatch();
+                Stopwatch s3 = new Stopwatch();
+                var sortype = 0;
+                long[] average = {9999999999};
+                Console.WriteLine("choose the algorithms");
+                Console.WriteLine(
+                    "1-Stooge sort; 2-Buuble sort; 3-Shaker-sort,4 show the the fastest(only after using all three)");
+                Console.WriteLine("5 - to save sorted file");
+                Console.WriteLine("6-to choose another file,input 7 twice to stop the program");
 
 
 
 
-            //var numberOfRows = lines.Count();
-            //var numberOfValues = arrays.Sum(s => s.Length);
+                while (sortype < 7)
+                {
+                    sortype = Convert.ToInt32(Console.ReadLine());
+                    if (sortype >= 7)
+                    {
 
-            //Console.WriteLine(numberOfRows);
-            //Console.WriteLine(numberOfValues);
-            Console.ReadLine();
+                        break;
 
+                    }
+
+                    switch (sortype)
+                    {
+                        case 1:
+                            //var rand = ran.BogoSort(intarray);
+                            s1.Reset();
+                            s1.Start();
+
+                            Console.WriteLine("Stooge sorted: {0}", string.Join(",", sto.StoogeSort(intarray)));
+
+                            //Console.WriteLine("Random sort used:{0}", string.Join(",", rand));
+                            s1.Stop();
+                            Console.WriteLine("elapsed time in millieseconds:{0}", s1.ElapsedMilliseconds);
+
+                            break;
+                        case 2:
+                            s2.Reset();
+                            s2.Start();
+                            Console.WriteLine("Bubble sorted: {0}", string.Join(",", bub.BubbleSort(intarray)));
+                            //var bubd = bub.BubbleSort(intarray);
+                            //Console.WriteLine("Bubble sort used:{0}", string.Join(",", bubd));
+                            s2.Stop();
+                            Console.WriteLine("elapsed time in millieseconds:{0}", s2.ElapsedMilliseconds);
+                            break;
+                        case 3:
+                            //var shaka = shak.ShakerSort(intarray);
+                            s3.Reset();
+                            s3.Start();
+                            Console.WriteLine("Shaker sorted: {0}", string.Join(",", shak.ShakerSort(intarray)));
+                            //Console.WriteLine("Shaker sort used:{0}", string.Join(",", shaka));
+                            s3.Stop();
+                            Console.WriteLine("elapsed time in millieseconds:{0}", s3.ElapsedMilliseconds);
+                            break;
+
+                        case 4:
+                            List<long> list = average.ToList();
+                            list.Add(s1.ElapsedMilliseconds);
+                            list.Add(s2.ElapsedMilliseconds);
+                            list.Add(s3.ElapsedMilliseconds);
+                            long[] lipsihigh = list.ToArray()[1..];
+                            var min = list.Min();
+                            var indexoflong = list.IndexOf(min);
+                            Console.WriteLine("Stoogesort,Buublesort,Shakersort");
+                            Console.WriteLine("{0}", string.Join(",", lipsihigh));
+                            switch (indexoflong)
+                            {
+                                case 1:
+                                    Console.WriteLine("the fastest algorithms is the Stoogesort {0} millieseconds",
+                                        min);
+                                    break;
+                                case 2:
+                                    Console.WriteLine("the fastest algorithms is the Bubblesort {0} millieseconds",
+                                        min);
+                                    break;
+                                case 3:
+                                    Console.WriteLine("the fastest algorithms is the Shakersort {0} milliesecond", min);
+                                    break;
+                            }
+                            
+                            Console.WriteLine("5 - to save sorted file");
+
+                            break;
+                        case 5:
+                            WriteThetext(shak.ShakerSort(intarray), pathy);
+                            Console.WriteLine("current file was sorted and saved as sorted_{0}.txt", pathy);
+                            break;
+
+                        case 6:
+                            rs = ReadAndRun();
+                            intarray = rs.arr;
+                            pathy = rs.pathy;
+                            Console.WriteLine("choose the algorithms");
+                            Console.WriteLine(
+                                "1-Stooge sort; 2-Buuble sort; 3-Shaker-sort,4 show the the fastest(only after using all three)");
+
+                            Console.WriteLine("5 - to save sorted file");
+                            Console.WriteLine("6-to choose another file,input 7 twice to stop");
+                            break;
+
+
+
+
+
+
+
+                    }
+
+
+
+
+
+
+
+
+                }
+
+
+
+
+
+                //var numberOfRows = lines.Count();
+                //var numberOfValues = arrays.Sum(s => s.Length);
+
+                //Console.WriteLine(numberOfRows);
+                //Console.WriteLine(numberOfValues);
+                Console.ReadLine();
+
+            }
         }
-
-        
-
-        
     }
-    
 }
+ 
