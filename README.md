@@ -1,5 +1,5 @@
    put text files with numbeirs separated with space or "," to directory bin/debug/net6.0       
-    all files should be with ".txt"
+    all files should be with ".txt"\n
      1 is stooge sorting algo
       2 is bubble sort
      3 is shaker sort
